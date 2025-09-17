@@ -287,7 +287,7 @@ watch([selectedKecamatan, selectedOpd], () => {
                 </div>
 
                 <div class="filter-item">
-                    <label for="opd-filter" class="filter-label">🏢 Filter OPD</label>
+                    <label for="opd-filter" class="filter-label">🏢 Filter OPD Pemilik Aset</label>
                     <select id="opd-filter" v-model="selectedOpd" class="filter-select">
                         <option value="">Semua OPD ({{ balihos.length }})</option>
                         <option v-for="o in allOpdOptions" :key="o" :value="o">{{ o }} ({{ getOpdCount(o) }} baliho)</option>
