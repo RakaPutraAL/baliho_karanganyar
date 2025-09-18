@@ -13,8 +13,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('opd_id')->nullable();
             $table->foreign('opd_id')->references('id')->on('opds')->onDelete('set null');
-            $table->string('jenis_baliho');
-            $table->string('pemasangan');
             $table->string('view');
             $table->string('dimensi');
             $table->string('jenis_kontruksi');
