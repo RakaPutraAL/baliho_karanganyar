@@ -21,8 +21,6 @@ interface Baliho {
     id: number;
     foto?: string | null;
     opd_id?: number | null;
-    jenis_baliho: string;
-    pemasangan: string;
     view: string;
     dimensi: string;
     jenis_kontruksi: string;
@@ -85,8 +83,6 @@ const handleDelete = (id: number) => {
                         <TableRow>
                             <TableHead>Foto</TableHead>
                             <TableHead>Nama Opd</TableHead>
-                            <TableHead>Jenis Baliho</TableHead>
-                            <TableHead>Pemasangan</TableHead>
                             <TableHead>View</TableHead>
                             <TableHead>Dimensi</TableHead>
                             <TableHead>Jenis Kontruksi</TableHead>
@@ -109,8 +105,6 @@ const handleDelete = (id: number) => {
                                 <span v-else>-</span>
                             </TableCell>
                             <TableCell>{{ baliho.opd?.nama_opd ?? '-' }}</TableCell>
-                            <TableCell>{{ baliho.jenis_baliho }}</TableCell>
-                            <TableCell>{{ baliho.pemasangan }}</TableCell>
                             <TableCell>{{ baliho.view }}</TableCell>
                             <TableCell>{{ baliho.dimensi }}</TableCell>
                             <TableCell>{{ baliho.jenis_kontruksi }}</TableCell>

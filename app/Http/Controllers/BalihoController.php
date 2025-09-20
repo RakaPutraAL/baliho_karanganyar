@@ -44,8 +44,6 @@ class BalihoController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'jenis_baliho'    => 'required|string|max:255',
-            'pemasangan'      => 'required|string|max:255',
             'view'            => 'required|string|max:255',
             'dimensi'         => 'required|string|max:255',
             'jenis_kontruksi' => 'required|string|max:255',
@@ -88,8 +86,6 @@ class BalihoController extends Controller
     public function update(Request $request, Baliho $baliho)
     {
         $validated = $request->validate([
-            'jenis_baliho'    => 'required|string|max:255',
-            'pemasangan'      => 'required|string|max:255',
             'view'            => 'required|string|max:255',
             'dimensi'         => 'required|string|max:255',
             'jenis_kontruksi' => 'required|string|max:255',
@@ -187,8 +183,6 @@ class BalihoController extends Controller
     foreach ($balihos as $baliho) {
         $sheet->setCellValue("A$row", $baliho->id);
         $sheet->setCellValue("B$row", $baliho->opd->nama_opd ?? '-');
-        $sheet->setCellValue("C$row", $baliho->jenis_baliho);
-        $sheet->setCellValue("D$row", $baliho->pemasangan);
         $sheet->setCellValue("E$row", $baliho->view);
         $sheet->setCellValue("F$row", $baliho->dimensi);
         $sheet->setCellValue("G$row", $baliho->jenis_kontruksi);

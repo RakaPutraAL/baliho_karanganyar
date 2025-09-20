@@ -20,8 +20,6 @@ type Opd = {
 
 type Baliho = {
     id: number;
-    jenis_baliho: string;
-    pemasangan: string;
     view: string;
     dimensi: string;
     jenis_kontruksi: string;
@@ -42,6 +40,8 @@ const balihos = page.props.balihos as Baliho[];
 -------------------------------------------------- */
 const selectedKecamatan = ref<string>('');
 const selectedOpd = ref<string>('');
+const selectedJenisKontruksi = ref<string>('');
+
 /* kita tetap pakai showTable supaya bisa di-reset,
    tapi akan otomatis true saat filter berubah */
 const showTable = ref<boolean>(false);
@@ -61,6 +61,12 @@ const allOpdOptions = computed(() => {
     return Array.from(unique).sort();
 });
 
+const allJenisKontruksiOptions = computed(() => {
+    const unique = new Set<string>();
+    balihos.forEach((b) => b.jenis_kontruksi && unique.add(b.jenis_kontruksi));
+    return Array.from(unique).sort();
+});
+
 /* -------------------------------------------------
    Filtered list
 -------------------------------------------------- */
@@ -68,9 +74,12 @@ const filteredBalihos = computed(() =>
     balihos.filter((b) => {
         const matchKecamatan = !selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value;
         const matchOpd = !selectedOpd.value || b.opd?.nama_opd === selectedOpd.value;
-        return matchKecamatan && matchOpd;
+        const matchJenisKontruksi = !selectedJenisKontruksi.value || b.jenis_kontruksi === selectedJenisKontruksi.value; 
+        return matchKecamatan && matchOpd && matchJenisKontruksi;
     }),
 );
+
+
 
 /* -------------------------------------------------
    Count helpers
@@ -81,6 +90,14 @@ const getKecamatanCount = (kecamatanName: string) =>
 const getOpdCount = (opdName: string) =>
     balihos.filter((b) => b.opd?.nama_opd === opdName && (!selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value))
         .length;
+
+const getJenisKontruksiCount = (jenisKontruksi: string) =>
+    balihos.filter((b) => 
+        b.jenis_kontruksi === jenisKontruksi && 
+        (!selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value) &&
+        (!selectedOpd.value || b.opd?.nama_opd === selectedOpd.value)
+    ).length;
+
 
 /* -------------------------------------------------
    Map
@@ -105,6 +122,7 @@ let geoLayer: L.GeoJSON;
 function clearFilters() {
     selectedKecamatan.value = '';
     selectedOpd.value = '';
+    selectedJenisKontruksi.value = '';
     showTable.value = false;
 }
 
@@ -135,8 +153,6 @@ function updateMarkers() {
                         <h3 style="margin:0 0 12px;font-size:18px;color:#2c3e50;border-bottom:2px solid #e0e0e0;padding-bottom:6px;">📋 Detail Informasi</h3>
                         <ul style="padding:0;margin:0;list-style:none;font-size:14px;color:#555">
                             <li style="margin:8px 0"><strong>Nama OPD:</strong> ${b.opd?.nama_opd ?? '-'}</li>
-                            <li style="margin:8px 0"><strong>Jenis Baliho:</strong> ${b.jenis_baliho}</li>
-                            <li style="margin:8px 0"><strong>Pemasangan:</strong> ${b.pemasangan}</li>
                             <li style="margin:8px 0"><strong>View:</strong> ${b.view}</li>
                             <li style="margin:8px 0"><strong>Dimensi:</strong> ${b.dimensi}</li>
                             <li style="margin:8px 0"><strong>Jenis Konstruksi:</strong> ${b.jenis_kontruksi}</li>
@@ -215,7 +231,7 @@ onMounted(() => {
 /* -------------------------------------------------
    Watch filters -> auto show table
 -------------------------------------------------- */
-watch([selectedKecamatan, selectedOpd], () => {
+watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
     showTable.value = true; // <--- ini kunci otomatis tampil
     if (map) updateMarkers();
 });
@@ -279,6 +295,14 @@ watch([selectedKecamatan, selectedOpd], () => {
         <!-- Filter Controls -->
         <div class="filter-container">
             <div class="filter-wrapper">
+                 <div class="filter-item">
+                    <label for="konstruksi-filter" class="filter-label">🏗️ Filter Jenis Konstruksi</label>
+                    <select id="konstruksi-filter" v-model="selectedJenisKontruksi" class="filter-select">
+                        <option value="">Semua Jenis ({{ balihos.length }})</option>
+                        <option v-for="jk in allJenisKontruksiOptions" :key="jk" :value="jk">{{ jk }} ({{ getJenisKontruksiCount(jk) }} baliho)</option>
+                    </select>
+                </div>
+
                 <div class="filter-item">
                     <label for="kecamatan-filter" class="filter-label">🗺️ Filter Kecamatan</label>
                     <select id="kecamatan-filter" v-model="selectedKecamatan" class="filter-select">
@@ -286,6 +310,7 @@ watch([selectedKecamatan, selectedOpd], () => {
                         <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }} baliho)</option>
                     </select>
                 </div>
+
 
                 <div class="filter-item">
                     <label for="opd-filter" class="filter-label">🏢 Filter OPD Pemilik Aset</label>
@@ -327,8 +352,6 @@ watch([selectedKecamatan, selectedOpd], () => {
                         <TableRow class="table-header-row">
                             <TableHead class="table-head">Foto</TableHead>
                             <TableHead class="table-head">Nama OPD</TableHead>
-                            <TableHead class="table-head">Jenis Baliho</TableHead>
-                            <TableHead class="table-head">Pemasangan</TableHead>
                             <TableHead class="table-head">View</TableHead>
                             <TableHead class="table-head">Dimensi</TableHead>
                             <TableHead class="table-head">Jenis Konstruksi</TableHead>
@@ -350,10 +373,7 @@ watch([selectedKecamatan, selectedOpd], () => {
                                 <span v-else class="font-medium text-amber-600">📷 Tidak ada foto</span>
                             </TableCell>
                             <TableCell class="table-cell"
-                                ><span class="font-medium text-blue-700">{{ b.opd?.nama_opd ?? '🏢 Tidak ada OPD' }}</span></TableCell
-                            >
-                            <TableCell class="table-cell">{{ b.jenis_baliho }}</TableCell>
-                            <TableCell class="table-cell">{{ b.pemasangan }}</TableCell>
+                                ><span class="font-medium text-blue-700">{{ b.opd?.nama_opd ?? '🏢 Tidak ada OPD' }}</span></TableCell >
                             <TableCell class="table-cell">{{ b.view }}</TableCell>
                             <TableCell class="table-cell">{{ b.dimensi }}</TableCell>
                             <TableCell class="table-cell">{{ b.jenis_kontruksi }}</TableCell>
