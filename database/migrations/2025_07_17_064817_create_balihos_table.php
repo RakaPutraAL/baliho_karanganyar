@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('dimensi');
             $table->string('jenis_kontruksi');
             $table->string('alamat');
-            $table->unsignedBigInteger('kode')->nullable();
-            $table->foreign('kode')->references('kode')->on('kecamatan')->onDelete('set null');
+            $table->string('kode',4)->nullable();
+            $table->foreign('kode')->references('kode')->on('kecamatans')->onDelete('set null');
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->string('foto')->nullable();
