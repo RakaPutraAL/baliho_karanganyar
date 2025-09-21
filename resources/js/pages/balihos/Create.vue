@@ -116,7 +116,7 @@ onMounted(() => {
             <form @submit.prevent="handleSubmit" class="w-full space-y-4 md:w-8/12" enctype="multipart/form-data">
                 <!-- Dropdown OPD -->
                 <div class="space-y-2">
-                    <Label class="font-semibold text-gray-200">OPD</Label>
+                    <Label class="font-semibold text-black-200">OPD</Label>
                     <select
                         v-model="form.opd_id"
                         class="w-full rounded-xl border border-gray-600 bg-gray-900 p-3 text-gray-100 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-500"
@@ -140,13 +140,13 @@ onMounted(() => {
                 <!-- Dimensi -->
                 <div class="space-y-2">
                     <Label>Dimensi</Label>
-                    <Input v-model="form.dimensi" type="text" placeholder="Dimensi" />
+                    <Input v-model="form.dimensi" type="text" placeholder="Dimensi (Contoh=2x3M)" />
                     <div class="text-sm text-red-600" v-if="form.errors.dimensi">{{ form.errors.dimensi }}</div>
                 </div>
 
                 <!-- Jenis Kontruksi -->
                 <div class="space-y-2">
-                    <Label class="font-semibold text-gray-200">Jenis Kontruksi</Label>
+                    <Label class="font-semibold text-black-200">Jenis Kontruksi</Label>
                     <select
                         v-model="form.jenis_kontruksi"
                         class="w-full rounded-xl border border-gray-600 bg-gray-900 p-3 text-gray-100 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-500"
@@ -167,7 +167,7 @@ onMounted(() => {
 
                 <!-- Dropdown Kecamatan -->
                 <div class="space-y-2">
-                    <Label class="font-semibold text-gray-200">Kecamatan</Label>
+                    <Label class="font-semibold text-black-200">Kecamatan</Label>
                     <select
                         v-model="form.kode"
                         class="w-full rounded-xl border border-gray-600 bg-gray-900 p-3 text-gray-100 shadow-sm focus:border-gray-400 focus:ring focus:ring-gray-500"
