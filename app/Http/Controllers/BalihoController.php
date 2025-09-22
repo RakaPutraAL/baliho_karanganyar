@@ -152,17 +152,14 @@ class BalihoController extends Controller
     $headers = [
         'A1' => 'ID',
         'B1' => 'OPD',
-        'C1' => 'Jenis Baliho',
-        'D1' => 'Pemasangan',
-        'E1' => 'View',
-        'F1' => 'Dimensi',
-        'G1' => 'Jenis Kontruksi',
-        'H1' => 'Jumlah',
-        'I1' => 'Alamat',
-        'J1' => 'Kecamatan',
-        'K1' => 'Latitude',
-        'L1' => 'Longitude',
-        'M1' => 'Foto',
+        'C1' => 'View',
+        'D1' => 'Dimensi',
+        'E1' => 'Jenis Kontruksi',
+        'F1' => 'Alamat',
+        'G1' => 'Kecamatan',
+        'H1' => 'Latitude',
+        'I1' => 'Longitude',
+        'J1' => 'Foto',
     ];
 
     foreach ($headers as $cell => $value) {
@@ -170,7 +167,7 @@ class BalihoController extends Controller
     }
 
    
-    $sheet->getStyle('A1:M1')->applyFromArray([
+    $sheet->getStyle('A1:J1')->applyFromArray([
         'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => '4F81BD']],
@@ -183,14 +180,13 @@ class BalihoController extends Controller
     foreach ($balihos as $baliho) {
         $sheet->setCellValue("A$row", $baliho->id);
         $sheet->setCellValue("B$row", $baliho->opd->nama_opd ?? '-');
-        $sheet->setCellValue("E$row", $baliho->view);
-        $sheet->setCellValue("F$row", $baliho->dimensi);
-        $sheet->setCellValue("G$row", $baliho->jenis_kontruksi);
-        $sheet->setCellValue("H$row", $baliho->jumlah);
-        $sheet->setCellValue("I$row", $baliho->alamat);
-        $sheet->setCellValue("J$row", $baliho->kecamatan->nama_kecamatan ?? '-');
-        $sheet->setCellValue("K$row", $baliho->latitude);
-        $sheet->setCellValue("L$row", $baliho->longitude);
+        $sheet->setCellValue("C$row", $baliho->view);
+        $sheet->setCellValue("D$row", $baliho->dimensi);
+        $sheet->setCellValue("E$row", $baliho->jenis_kontruksi);
+        $sheet->setCellValue("F$row", $baliho->alamat);
+        $sheet->setCellValue("G$row", $baliho->kecamatan->nama_kecamatan ?? '-');
+        $sheet->setCellValue("H$row", $baliho->latitude);
+        $sheet->setCellValue("I$row", $baliho->longitude);
 
     
         if ($baliho->foto) {
@@ -218,19 +214,19 @@ class BalihoController extends Controller
                     $imageInfo = getimagesize($validPath);
                     if ($imageInfo === false) {
                         \Log::error("Invalid image format: " . $validPath);
-                        $sheet->setCellValue("M$row", 'Invalid Image Format');
+                        $sheet->setCellValue("J$row", 'Invalid Image Format');
                         $errorCount++;
                     } else {
                         
                         $fileSize = filesize($validPath);
                         if ($fileSize > 2097152) {
                             \Log::warning("File too large (" . round($fileSize/1024/1024, 2) . "MB): " . $validPath);
-                            $sheet->setCellValue("M$row", 'File Too Large');
+                            $sheet->setCellValue("J$row", 'File Too Large');
                             $errorCount++;
                         } else {
                             $drawing = new Drawing();
                             $drawing->setPath($validPath);
-                            $drawing->setCoordinates("M$row");
+                            $drawing->setCoordinates("J$row");
                             $drawing->setOffsetX(5);
                             $drawing->setOffsetY(5);
                             $drawing->setHeight(70);
@@ -238,7 +234,7 @@ class BalihoController extends Controller
 
                             // Set row height dan column width
                             $sheet->getRowDimension($row)->setRowHeight(70);
-                            $sheet->getColumnDimension('M')->setWidth(20);
+                            $sheet->getColumnDimension('J')->setWidth(20);
                             
                             $photoCount++;
                             \Log::info("Photo added successfully: " . $validPath);
@@ -246,16 +242,16 @@ class BalihoController extends Controller
                     }
                 } catch (\Exception $e) {
                     \Log::error("Error adding photo: " . $e->getMessage());
-                    $sheet->setCellValue("M$row", 'Error Loading Image');
+                    $sheet->setCellValue("J$row", 'Error Loading Image');
                     $errorCount++;
                 }
             } else {
                 \Log::error("Photo file not found. Tried paths: " . implode(', ', $possiblePaths));
-                $sheet->setCellValue("M$row", 'File Not Found');
+                $sheet->setCellValue("J$row", 'File Not Found');
                 $errorCount++;
             }
         } else {
-            $sheet->setCellValue("M$row", 'No Photo');
+            $sheet->setCellValue("J$row", 'No Photo');
         }
 
         $row++;
@@ -265,7 +261,7 @@ class BalihoController extends Controller
     \Log::info("Export completed. Photos added: $photoCount, Errors: $errorCount");
 
   
-    $sheet->getStyle("A1:M" . ($row - 1))->applyFromArray([
+    $sheet->getStyle("A1:J" . ($row - 1))->applyFromArray([
         'borders' => [
             'allBorders' => [
                 'borderStyle' => Border::BORDER_THIN,
