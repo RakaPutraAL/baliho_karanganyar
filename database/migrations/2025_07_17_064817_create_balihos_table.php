@@ -11,13 +11,13 @@ return new class extends Migration
     {
         Schema::create('balihos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('opd_id')->nullable();
+            $table->string('opd_id')->nullable();
             $table->foreign('opd_id')->references('id')->on('opds')->onDelete('set null');
             $table->string('view');
             $table->string('dimensi');
             $table->string('jenis_kontruksi');
             $table->string('alamat');
-            $table->string('kode',4)->nullable();
+            $table->string('kode',6)->nullable();
             $table->foreign('kode')->references('kode')->on('kecamatans')->onDelete('set null');
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
