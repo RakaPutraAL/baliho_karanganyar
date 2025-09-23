@@ -31,16 +31,16 @@ class BalihoController extends Controller
 
     
     public function create()
-{
-    $kecamatans = Kecamatan::orderBy('nama_kecamatan', 'asc')->get();
+    {
+        $kecamatans = Kecamatan::orderBy('nama_kecamatan', 'asc')->get();
 
-    $opds = Opd::orderBy('nama_opd', 'asc')->get()->unique('nama_opd')->values();
+        $opds = Opd::orderBy('nama_opd', 'asc')->get()->unique('nama_opd')->values();
 
-    return Inertia::render('balihos/Create', [
-        'kecamatans' => $kecamatans,
-        'opds'       => $opds
-    ]);
-}
+        return Inertia::render('balihos/Create', [
+            'kecamatans' => $kecamatans,
+            'opds'       => $opds
+        ]);
+    }
 
     public function store(Request $request)
     {
