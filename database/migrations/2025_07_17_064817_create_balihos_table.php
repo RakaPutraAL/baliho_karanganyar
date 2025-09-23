@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('balihos', function (Blueprint $table) {
             $table->id();
-            $table->string('opd_id')->nullable();
+            $table->unsignedBigInteger('opd_id')->nullable();
             $table->foreign('opd_id')->references('id')->on('opds')->onDelete('set null');
             $table->string('view');
             $table->string('dimensi');
