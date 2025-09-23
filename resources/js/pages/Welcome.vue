@@ -298,7 +298,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="konstruksi-filter" class="filter-label">🏗️ Filter Jenis Konstruksi</label>
                     <select id="konstruksi-filter" v-model="selectedJenisKontruksi" class="filter-select">
                         <option value="">Semua Jenis ({{ balihos.length }})</option>
-                        <option v-for="jk in allJenisKontruksiOptions" :key="jk" :value="jk">{{ jk }} ({{ getJenisKontruksiCount(jk) }} baliho)</option>
+                        <option v-for="jk in allJenisKontruksiOptions" :key="jk" :value="jk">{{ jk }} ({{ getJenisKontruksiCount(jk) }})</option>
                     </select>
                 </div>
 
@@ -306,7 +306,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="kecamatan-filter" class="filter-label">🗺️ Filter Kecamatan</label>
                     <select id="kecamatan-filter" v-model="selectedKecamatan" class="filter-select">
                         <option value="">Semua Kecamatan ({{ balihos.length }})</option>
-                        <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }} baliho)</option>
+                        <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }})</option>
                     </select>
                 </div>
 
@@ -315,7 +315,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="opd-filter" class="filter-label">🏢 Filter OPD Pemilik Aset</label>
                     <select id="opd-filter" v-model="selectedOpd" class="filter-select">
                         <option value="">Semua OPD ({{ balihos.length }})</option>
-                        <option v-for="o in allOpdOptions" :key="o" :value="o">{{ o }} ({{ getOpdCount(o) }} baliho)</option>
+                        <option v-for="o in allOpdOptions" :key="o" :value="o">{{ o }} ({{ getOpdCount(o) }})</option>
                     </select>
                 </div>
 

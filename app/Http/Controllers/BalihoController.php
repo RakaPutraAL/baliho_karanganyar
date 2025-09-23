@@ -6,6 +6,7 @@ use App\Models\Baliho;
 use App\Models\Kecamatan;
 use App\Models\Opd;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -213,14 +214,14 @@ class BalihoController extends Controller
                     
                     $imageInfo = getimagesize($validPath);
                     if ($imageInfo === false) {
-                        \Log::error("Invalid image format: " . $validPath);
+                        Log::error("Invalid image format: " . $validPath);
                         $sheet->setCellValue("J$row", 'Invalid Image Format');
                         $errorCount++;
                     } else {
                         
                         $fileSize = filesize($validPath);
                         if ($fileSize > 2097152) {
-                            \Log::warning("File too large (" . round($fileSize/1024/1024, 2) . "MB): " . $validPath);
+                            Log::warning("File too large (" . round($fileSize/1024/1024, 2) . "MB): " . $validPath);
                             $sheet->setCellValue("J$row", 'File Too Large');
                             $errorCount++;
                         } else {
@@ -237,16 +238,16 @@ class BalihoController extends Controller
                             $sheet->getColumnDimension('J')->setWidth(20);
                             
                             $photoCount++;
-                            \Log::info("Photo added successfully: " . $validPath);
+                            Log::info("Photo added successfully: " . $validPath);
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::error("Error adding photo: " . $e->getMessage());
+                    Log::error("Error adding photo: " . $e->getMessage());
                     $sheet->setCellValue("J$row", 'Error Loading Image');
                     $errorCount++;
                 }
             } else {
-                \Log::error("Photo file not found. Tried paths: " . implode(', ', $possiblePaths));
+                Log::error("Photo file not found. Tried paths: " . implode(', ', $possiblePaths));
                 $sheet->setCellValue("J$row", 'File Not Found');
                 $errorCount++;
             }
@@ -258,7 +259,7 @@ class BalihoController extends Controller
     }
 
   
-    \Log::info("Export completed. Photos added: $photoCount, Errors: $errorCount");
+    Log::info("Export completed. Photos added: $photoCount, Errors: $errorCount");
 
   
     $sheet->getStyle("A1:J" . ($row - 1))->applyFromArray([
