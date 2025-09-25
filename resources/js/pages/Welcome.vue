@@ -5,7 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch,nextTick } from 'vue';
 
 type Kecamatan = {
     kode: string;
@@ -30,7 +30,7 @@ type Baliho = {
     foto?: string | null;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Maps', href: '/maps' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Peta Baliho', href: '/maps' }];
 const page = usePage();
 const balihos = page.props.balihos as Baliho[];
 
@@ -127,6 +127,18 @@ function clearFilters() {
 
 function applyFilters() {
     showTable.value = true;
+    
+    // Scroll ke tabel dengan animasi smooth setelah DOM ter-update
+    nextTick(() => {
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+            tableContainer.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            });
+        }
+    });
 }
 
 function handleDelete(id: number) {
@@ -237,7 +249,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
 </script>
 
 <template>
-    <Head title="Maps" />
+    <Head title="Peta Baliho" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- Ganti bagian header lama -->
         <div class="baliho-banner">

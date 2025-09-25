@@ -6,7 +6,7 @@ import { Head, router, usePage } from '@inertiajs/vue3';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch,nextTick } from 'vue';
 
 type Kecamatan = {
     kode: string;
@@ -31,7 +31,7 @@ type Baliho = {
     foto?: string | null;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Maps', href: '/maps' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Peta Baliho', href: '/maps' }];
 const page = usePage();
 const balihos = page.props.balihos as Baliho[];
 
@@ -128,6 +128,18 @@ function clearFilters() {
 
 function applyFilters() {
     showTable.value = true;
+    
+    // Scroll ke tabel dengan animasi smooth setelah DOM ter-update
+    nextTick(() => {
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+            tableContainer.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            });
+        }
+    });
 }
 
 function handleDelete(id: number) {
@@ -238,7 +250,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
 </script>
 
 <template>
-    <Head title="Maps" />
+    <Head title="Peta Baliho" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- Ganti bagian header lama -->
         <div class="baliho-banner">
@@ -299,7 +311,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="konstruksi-filter" class="filter-label">🏗️ Filter Jenis Konstruksi</label>
                     <select id="konstruksi-filter" v-model="selectedJenisKontruksi" class="filter-select">
                         <option value="">Semua Jenis ({{ balihos.length }})</option>
-                        <option v-for="jk in allJenisKontruksiOptions" :key="jk" :value="jk">{{ jk }} ({{ getJenisKontruksiCount(jk) }} baliho)</option>
+                        <option v-for="jk in allJenisKontruksiOptions" :key="jk" :value="jk">{{ jk }} ({{ getJenisKontruksiCount(jk) }})</option>
                     </select>
                 </div>
 
@@ -307,7 +319,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="kecamatan-filter" class="filter-label">🗺️ Filter Kecamatan</label>
                     <select id="kecamatan-filter" v-model="selectedKecamatan" class="filter-select">
                         <option value="">Semua Kecamatan ({{ balihos.length }})</option>
-                        <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }} baliho)</option>
+                        <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }})</option>
                     </select>
                 </div>
 
@@ -316,7 +328,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                     <label for="opd-filter" class="filter-label">🏢 Filter OPD Pemilik Aset</label>
                     <select id="opd-filter" v-model="selectedOpd" class="filter-select">
                         <option value="">Semua OPD ({{ balihos.length }})</option>
-                        <option v-for="o in allOpdOptions" :key="o" :value="o">{{ o }} ({{ getOpdCount(o) }} baliho)</option>
+                        <option v-for="o in allOpdOptions" :key="o" :value="o">{{ o }} ({{ getOpdCount(o) }})</option>
                     </select>
                 </div>
 
