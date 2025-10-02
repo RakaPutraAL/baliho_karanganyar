@@ -5,8 +5,8 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { computed, onMounted, ref, watch,nextTick } from 'vue';
 
 type Kecamatan = {
     kode: string;
@@ -74,12 +74,10 @@ const filteredBalihos = computed(() =>
     balihos.filter((b) => {
         const matchKecamatan = !selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value;
         const matchOpd = !selectedOpd.value || b.opd?.nama_opd === selectedOpd.value;
-        const matchJenisKontruksi = !selectedJenisKontruksi.value || b.jenis_kontruksi === selectedJenisKontruksi.value; 
+        const matchJenisKontruksi = !selectedJenisKontruksi.value || b.jenis_kontruksi === selectedJenisKontruksi.value;
         return matchKecamatan && matchOpd && matchJenisKontruksi;
     }),
 );
-
-
 
 /* -------------------------------------------------
    Count helpers
@@ -92,12 +90,12 @@ const getOpdCount = (opdName: string) =>
         .length;
 
 const getJenisKontruksiCount = (jenisKontruksi: string) =>
-    balihos.filter((b) => 
-        b.jenis_kontruksi === jenisKontruksi && 
-        (!selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value) &&
-        (!selectedOpd.value || b.opd?.nama_opd === selectedOpd.value)
+    balihos.filter(
+        (b) =>
+            b.jenis_kontruksi === jenisKontruksi &&
+            (!selectedKecamatan.value || b.kecamatan?.nama_kecamatan === selectedKecamatan.value) &&
+            (!selectedOpd.value || b.opd?.nama_opd === selectedOpd.value),
     ).length;
-
 
 /* -------------------------------------------------
    Map
@@ -128,15 +126,15 @@ function clearFilters() {
 
 function applyFilters() {
     showTable.value = true;
-    
+
     // Scroll ke tabel dengan animasi smooth setelah DOM ter-update
     nextTick(() => {
         const tableContainer = document.querySelector('.table-container');
         if (tableContainer) {
-            tableContainer.scrollIntoView({ 
+            tableContainer.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start',
-                inline: 'nearest'
+                inline: 'nearest',
             });
         }
     });
@@ -156,49 +154,69 @@ function updateMarkers() {
         const fotoUrl = b.foto ? `/uploads/${b.foto}` : 'https://via.placeholder.com/600x400?text=No+Image';
 
         const popupContent = `
-            <div style="display:flex;flex-direction:row;width:900px;max-width:95vw;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);font-family:'Segoe UI',sans-serif;position:relative;">
-                <div style="flex:0 0 45%;background:#fafafa;border-right:2px solid #f0f0f0;">
-                    <img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;transition:transform .3s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
-                </div>
-                <div style="flex:1;padding:16px 20px;background:linear-gradient(135deg,#fdfdfd,#f8f9fa);display:flex;flex-direction:column;justify-content:space-between;">
-                    <div>
-                        <h3 style="margin:0 0 12px;font-size:18px;color:#2c3e50;border-bottom:2px solid #e0e0e0;padding-bottom:6px;">📋 Detail Informasi</h3>
-                        <ul style="padding:0;margin:0;list-style:none;font-size:14px;color:#555">
-                            <li style="margin:8px 0"><strong>Nama OPD:</strong> ${b.opd?.nama_opd ?? '-'}</li>
-                            <li style="margin:8px 0"><strong>View:</strong> ${b.view}</li>
-                            <li style="margin:8px 0"><strong>Dimensi:</strong> ${b.dimensi}</li>
-                            <li style="margin:8px 0"><strong>Jenis Konstruksi:</strong> ${b.jenis_kontruksi}</li>
-                            <li style="margin:8px 0"><strong>Alamat:</strong> ${b.alamat}</li>
-                            <li style="margin:8px 0"><strong>Kecamatan:</strong> ${b.kecamatan?.nama_kecamatan ?? '-'}</li>
-                        </ul>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap">
-  <a href="https://www.google.com/maps?q=${b.latitude},${b.longitude}" target="_blank"
-     style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-            background:#28a745;color:#fff;padding:6px 12px;
-            border-radius:20px;font-size:14px;text-decoration:none">
-     📍 <span>Share Lokasi</span>
-  </a>
-
-  <a href="https://wa.me/628112629999?text=Halo%20*SAPAMAS*,%20Saya%0ANama:%20...%0ADari:%20...%0ANIK%20/%20Email:%20...%0A%0Aada%20kendala%20terkait:%0A...." target="_blank"
-     style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-            background:#ff0000;color:#fff;padding:6px 12px;
-            border-radius:20px;font-size:14px;text-decoration:none">
-     ${pengaduanIcon} <span>Pengaduan</span>
-  </a>
-
-  <button onclick="window.closePopup()"
-     style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-            background:linear-gradient(to right,#36d1dc,#5b86e5);
-            color:#fff;padding:6px 12px;
-            border-radius:20px;border:none;font-size:14px;cursor:pointer">
-     ${closeIcon} <span>Tutup</span>
-  </button>
-</div>
-
-                </div>
+    <div style="display:flex;flex-direction:row;width:900px;max-width:95vw;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);font-family:'Segoe UI',sans-serif;position:relative;">
+        <div style="flex:0 0 45%;background:#fafafa;border-right:2px solid #f0f0f0;">
+            <img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;transition:transform .3s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+        </div>
+        <div style="flex:1;padding:16px 20px;background:linear-gradient(135deg,#fdfdfd,#f8f9fa);display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+                <h3 style="margin:0 0 12px;font-size:18px;color:#2c3e50;border-bottom:2px solid #e0e0e0;padding-bottom:6px;">📋 Detail Informasi</h3>
+                <ul style="padding:0;margin:0;list-style:none;font-size:14px;color:#555">
+                    <li style="margin:8px 0"><strong>Nama OPD:</strong> ${b.opd?.nama_opd ?? '-'}</li>
+                    <li style="margin:8px 0"><strong>View:</strong> ${b.view}</li>
+                    <li style="margin:8px 0"><strong>Dimensi:</strong> ${b.dimensi}</li>
+                    <li style="margin:8px 0"><strong>Jenis Konstruksi:</strong> ${b.jenis_kontruksi}</li>
+                    <li style="margin:8px 0"><strong>Alamat:</strong> ${b.alamat}</li>
+                    <li style="margin:8px 0"><strong>Kecamatan:</strong> ${b.kecamatan?.nama_kecamatan ?? '-'}</li>
+                </ul>
             </div>
-        `;
+            <div style="display:flex;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap">
+                <a href="https://www.google.com/maps?q=${b.latitude},${b.longitude}" target="_blank"
+                   style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+                          background:#28a745;color:#fff;padding:6px 12px;
+                          border-radius:20px;font-size:14px;text-decoration:none">
+                   📍 <span>Share Lokasi</span>
+                </a>
+
+                <div style="flex:1;position:relative;">
+                    <button onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'"
+                       style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;
+                              background:#ff6b35;color:#fff;padding:6px 12px;
+                              border-radius:20px;border:none;font-size:14px;cursor:pointer">
+                       📞 <span>Kontak Peminjaman ▼</span>
+                    </button>
+                   <div style="display:none;position:absolute;bottom:100%;left:0;right:0;margin-bottom:8px;
+                            background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);
+                            overflow:hidden;z-index:1000;">
+       <a href="tel:0271495066" 
+       style="display:block;padding:12px;text-decoration:none;color:#2c3e50;
+       border-bottom:1px solid #f0f0f0;transition:background 0.2s"
+       onmouseover="this.style.background='#f8f9fa'"
+       onmouseout="this.style.background='#fff'">
+       📱 (0271) 495066 (BKD)
+       </a>
+            <a href="tel:0271495039" 
+              style="display:block;padding:12px;text-decoration:none;color:#2c3e50;
+              transition:background 0.2s"
+              onmouseover="this.style.background='#f8f9fa'"
+              onmouseout="this.style.background='#fff'">
+              📱 (0271) 495039 (DISKOMINFO)
+        </a>
+        </div>
+                </div>
+                
+                
+                <button onclick="window.closePopup()"
+                   style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+                          background:linear-gradient(to right,#36d1dc,#5b86e5);
+                          color:#fff;padding:6px 12px;
+                          border-radius:20px;border:none;font-size:14px;cursor:pointer">
+                   ${closeIcon} <span>Tutup</span>
+                </button>
+            </div>
+        </div>
+    </div>
+`;
 
         const marker = L.marker([parseFloat(b.latitude), parseFloat(b.longitude)], { icon: balihoIcon })
             .addTo(map)
@@ -243,7 +261,7 @@ onMounted(() => {
 /* -------------------------------------------------
    Watch filters -> auto show table
 -------------------------------------------------- */
-watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
+watch([selectedKecamatan, selectedOpd, selectedJenisKontruksi], () => {
     showTable.value = true; // <--- ini kunci otomatis tampil
     if (map) updateMarkers();
 });
@@ -307,7 +325,7 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
         <!-- Filter Controls -->
         <div class="filter-container">
             <div class="filter-wrapper">
-                 <div class="filter-item">
+                <div class="filter-item">
                     <label for="konstruksi-filter" class="filter-label">🏗️ Filter Jenis Konstruksi</label>
                     <select id="konstruksi-filter" v-model="selectedJenisKontruksi" class="filter-select">
                         <option value="">Semua Jenis ({{ balihos.length }})</option>
@@ -322,7 +340,6 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                         <option v-for="k in allKecamatanOptions" :key="k" :value="k">{{ k }} ({{ getKecamatanCount(k) }})</option>
                     </select>
                 </div>
-
 
                 <div class="filter-item">
                     <label for="opd-filter" class="filter-label">🏢 Filter OPD Pemilik Aset</label>
@@ -385,7 +402,8 @@ watch([selectedKecamatan, selectedOpd ,selectedJenisKontruksi], () => {
                                 <span v-else class="font-medium text-amber-600">📷 Tidak ada foto</span>
                             </TableCell>
                             <TableCell class="table-cell"
-                                ><span class="font-medium text-blue-700">{{ b.opd?.nama_opd ?? '🏢 Tidak ada OPD' }}</span></TableCell >
+                                ><span class="font-medium text-blue-700">{{ b.opd?.nama_opd ?? '🏢 Tidak ada OPD' }}</span></TableCell
+                            >
                             <TableCell class="table-cell">{{ b.view }}</TableCell>
                             <TableCell class="table-cell">{{ b.dimensi }}</TableCell>
                             <TableCell class="table-cell">{{ b.jenis_kontruksi }}</TableCell>
