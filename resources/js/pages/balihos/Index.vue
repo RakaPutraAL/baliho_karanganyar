@@ -27,13 +27,30 @@ interface Baliho {
     alamat: string;
     latitude: number | null;
     longitude: number | null;
-    kode: string;         // 🔹 foreign key
+    kode: string;
     kecamatan?: Kecamatan | null;
-    opd?: Opd | null;  // 🔹 relasi (optional, kalau di-load dari backend)
+    opd?: Opd | null;
+}
+
+// ← Tambah interface untuk pagination
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedBalihos {
+    data: Baliho[];
+    links: PaginationLink[];
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    total: number;
 }
 
 interface Props {
-    balihos: Baliho[];
+    balihos: PaginatedBalihos; // ← bukan Baliho[] lagi
 }
 
 const props = defineProps<Props>();
@@ -66,7 +83,7 @@ const handleDelete = (id: number) => {
                     <AlertDescription>{{ page.props.flash.message }}</AlertDescription>
                 </Alert>
             </div>
-            
+
             <div class="mb-4 flex space-x-2">
                 <Link :href="route('balihos.create')">
                     <Button>Create a Baliho Entry</Button>
@@ -75,7 +92,8 @@ const handleDelete = (id: number) => {
                 <a :href="route('balihos.export')" class="inline-block">
                     <Button class="bg-green-600">Download Excel</Button>
                 </a>
-            </div>       
+            </div>
+
             <div>
                 <Table>
                     <TableCaption>Daftar Baliho</TableCaption>
@@ -87,14 +105,15 @@ const handleDelete = (id: number) => {
                             <TableHead>Dimensi</TableHead>
                             <TableHead>Jenis Kontruksi</TableHead>
                             <TableHead>Alamat</TableHead>
-                            <TableHead>Kecamatan</TableHead> <!-- 🔹 Tambah Kecamatan -->
+                            <TableHead>Kecamatan</TableHead>
                             <TableHead>Latitude</TableHead>
                             <TableHead>Longitude</TableHead>
                             <TableHead class="text-center">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="baliho in props.balihos" :key="baliho.id">
+                        <!-- ← Ubah jadi props.balihos.data -->
+                        <TableRow v-for="baliho in props.balihos.data" :key="baliho.id">
                             <TableCell>
                                 <img
                                     v-if="baliho.foto"
@@ -109,10 +128,7 @@ const handleDelete = (id: number) => {
                             <TableCell>{{ baliho.dimensi }}</TableCell>
                             <TableCell>{{ baliho.jenis_kontruksi }}</TableCell>
                             <TableCell>{{ baliho.alamat }}</TableCell>
-                            <TableCell>
-                                <!-- 🔹 Tampilkan nama_kecamatan kalau relasi diload -->
-                                {{ baliho.kecamatan?.nama_kecamatan ?? '-' }}
-                            </TableCell>
+                            <TableCell>{{ baliho.kecamatan?.nama_kecamatan ?? '-' }}</TableCell>
                             <TableCell>{{ baliho.latitude }}</TableCell>
                             <TableCell>{{ baliho.longitude }}</TableCell>
                             <TableCell class="text-center space-x-2">
@@ -124,6 +140,34 @@ const handleDelete = (id: number) => {
                         </TableRow>
                     </TableBody>
                 </Table>
+
+                <!-- ← Pagination -->
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                    <span>
+                        Menampilkan {{ props.balihos.from }}–{{ props.balihos.to }}
+                        dari {{ props.balihos.total }} data
+                    </span>
+                    <div class="flex flex-wrap gap-1">
+                        <template v-for="link in props.balihos.links" :key="link.label">
+                            <Link
+                                v-if="link.url"
+                                :href="link.url"
+                                v-html="link.label"
+                                preserve-scroll
+                                class="rounded border px-3 py-1"
+                                :class="link.active
+                                    ? 'bg-blue-600 text-white border-blue-600'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100'"
+                            />
+                            <span
+                                v-else
+                                v-html="link.label"
+                                class="rounded border px-3 py-1 text-gray-400 cursor-not-allowed"
+                            />
+                        </template>
+                    </div>
+                </div>
+
             </div>
         </div>
     </AppLayout>
